@@ -1,4 +1,4 @@
-import type { Holding } from "@/types";
+import type { Holding, Transaction } from "@/types";
 
 function genHistory(end: number, days = 30, volatility = 0.03): { date: string; price: number }[] {
   const out: { date: string; price: number }[] = [];
@@ -25,10 +25,10 @@ export const mockHoldings: Holding[] = [
   { id: "h8", symbol: "MIRAE-LC", name: "Mirae Asset Large Cap", type: "Mutual Fund", quantity: 1250, buyPrice: 92.4, currentPrice: 104.8, buyDate: "2023-09-12", history: genHistory(104.8, 30, 0.008) },
 ];
 
-export const mockTransactions = [
-  { id: "t1", symbol: "BTC", type: "Buy" as const, quantity: 0.05, price: 3010000, date: "2025-06-20" },
-  { id: "t2", symbol: "INFY", type: "Buy" as const, quantity: 10, price: 1570, date: "2025-06-18" },
-  { id: "t3", symbol: "SOL", type: "Sell" as const, quantity: 5, price: 14900, date: "2025-06-15" },
-  { id: "t4", symbol: "ETH", type: "Buy" as const, quantity: 0.5, price: 217000, date: "2025-06-12" },
-  { id: "t5", symbol: "RELIANCE", type: "Buy" as const, quantity: 5, price: 2940, date: "2025-06-08" },
+export const mockTransactions: Transaction[] = [
+  { id: "t1", symbol: "BTC", type: "Buy", quantity: 0.05, price: 3010000, date: "2025-06-20" },
+  { id: "t2", symbol: "INFY", type: "Buy", quantity: 10, price: 1570, date: "2025-06-18" },
+  { id: "t3", symbol: "SOL", type: "Sell", quantity: 5, price: 14900, date: "2025-06-15" },
+  { id: "t4", symbol: "ETH", type: "Buy", quantity: 0.5, price: 217000, date: "2025-06-12" },
+  { id: "t5", symbol: "RELIANCE", type: "Buy", quantity: 5, price: 2940, date: "2025-06-08" },
 ];

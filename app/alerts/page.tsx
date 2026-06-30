@@ -108,7 +108,7 @@ export default function AlertsPage() {
                   <tbody>
                   {alerts.map((a) => {
                     const m = marketService.bySymbol(a.symbol);
-                    const cur = m?.price ?? a.currentPrice;
+                    const cur = m?.price ?? a.currentPrice ?? 0;
 
                     return (
                         <tr

@@ -12,6 +12,7 @@ import { useExpenseStore, useBudgetStore } from "@/store";
 
 import { formatCurrency, formatPercent, cn } from "@/lib/utils";
 import type { ChatMessage } from "@/types";
+import api from "@/lib/api";
 
 const SUGGESTED = [
   "How is my portfolio doing?",
@@ -73,97 +74,7 @@ export default function AIPage() {
       )
   );
 
-  function reply(q: string): string {
-    const l = q.toLowerCase();
-
-    if (/portfolio|doing|perform/.test(l)) {
-      const best = [...stats.holdings].sort(
-          (a, b) =>
-              (b.currentPrice - b.buyPrice) / b.buyPrice -
-              (a.currentPrice - a.buyPrice) / a.buyPrice
-      )[0];
-
-      return `Your portfolio is at **${formatCurrency(
-          stats.totalValue
-      )}**, up **${formatPercent(stats.totalPLPct)}** (${formatCurrency(
-          stats.totalPL,
-          { signed: true }
-      )}) since purchase.
-
-- Best performer: **${best.symbol}** at ${formatPercent(
-          ((best.currentPrice - best.buyPrice) / best.buyPrice) * 100
-      )}
-- Today: ${formatCurrency(stats.todayChange, {
-        signed: true,
-      })} (${formatPercent(stats.todayPct)})
-- Largest position: **${topHolding.symbol}** (${formatCurrency(
-          topHolding.quantity * topHolding.currentPrice
-      )})`;
-    }
-
-    if (/overspend|spending|expense|budget/.test(l)) {
-      if (overBudget.length === 0) {
-        return `Good news — you're within budget on every category this month. Total spend is **${formatCurrency(
-            monthlySpend
-        )}**, health score **${budgetScore}/100**.`;
-      }
-
-      return `You're over budget in **${overBudget.length}** ${
-          overBudget.length === 1 ? "category" : "categories"
-      }:
-
-${overBudget
-          .map(
-              (b) =>
-                  `- **${b.category}**: ${formatCurrency(
-                      b.spent
-                  )} vs ${formatCurrency(b.limit)} limit`
-          )
-          .join("\n")}
-
-Consider trimming discretionary spend to improve your health score (**${budgetScore}/100**).`;
-    }
-
-    if (/risk|risky/.test(l)) {
-      const crypto = stats.holdings.filter(
-          (h) => h.type === "Crypto"
-      );
-
-      const cryptoVal = crypto.reduce(
-          (a, h) => a + h.quantity * h.currentPrice,
-          0
-      );
-
-      const pct = (cryptoVal / stats.totalValue) * 100;
-      const top = crypto[0];
-
-      return `Crypto makes up **${pct.toFixed(
-          0
-      )}%** of your portfolio (${formatCurrency(
-          cryptoVal
-      )}) — highest volatility bucket.
-
-Most exposed: **${top?.symbol ?? "—"}**.`;
-    }
-
-    if (/save|saving|tip/.test(l)) {
-      return `Based on your spending pattern:
-
-1. Cap ${topExpenseCat.category} at ${formatCurrency(
-          topExpenseCat.limit * 0.85
-      )}
-2. Automate ${formatCurrency(15000)}/month SIP
-3. Review subscriptions in Entertainment category`;
-    }
-
-    return `Your snapshot: **${formatCurrency(
-        stats.totalValue
-    )} invested**, **${formatCurrency(
-        monthlySpend
-    )} spent**, budget score **${budgetScore}/100**.`;
-  }
-
-  function send(q: string) {
+  async function send(q: string) {
     if (!q.trim()) return;
 
     setMessages((m) => [
@@ -174,17 +85,28 @@ Most exposed: **${top?.symbol ?? "—"}**.`;
     setInput("");
     setTyping(true);
 
-    setTimeout(() => {
+    try {
+      const res = await api.post("/ai/chat", { message: q });
       setMessages((m) => [
         ...m,
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: reply(q),
+          content: res.data.reply || "Unable to process right now."
         },
       ]);
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: "Sorry, I'm having trouble connecting to the AI service right now."
+        },
+      ]);
+    } finally {
       setTyping(false);
-    }, 1500);
+    }
   }
 
   const userMessages = messages.filter(

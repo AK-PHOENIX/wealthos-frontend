@@ -1,12 +1,48 @@
-import { ReactNode } from "react";
+"use client";
+
+import { ReactNode, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
 import { motion } from "framer-motion";
-import { useUIStore } from "@/store";
+import {
+  useUIStore,
+  useUserStore,
+  usePortfolioStore,
+  useExpenseStore,
+  useBudgetStore,
+  useAlertStore,
+  useMarketStore
+} from "@/store";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children, title }: { children: ReactNode; title: string }) {
   const collapsed = useUIStore((s) => s.sidebarCollapsed);
+  const router = useRouter();
+
+  const fetchUser = useUserStore((s) => s.fetchUser);
+  const fetchHoldings = usePortfolioStore((s) => s.fetchHoldings);
+  const fetchExpenses = useExpenseStore((s) => s.fetchExpenses);
+  const fetchBudgets = useBudgetStore((s) => s.fetchBudgets);
+  const fetchAlerts = useAlertStore((s) => s.fetchAlerts);
+  const fetchMarketData = useMarketStore((s) => s.fetchMarketData);
+
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("wealthos_token") : null;
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    // Fetch all backend data
+    fetchUser();
+    fetchHoldings();
+    fetchExpenses();
+    fetchBudgets();
+    fetchAlerts();
+    fetchMarketData();
+  }, [router, fetchUser, fetchHoldings, fetchExpenses, fetchBudgets, fetchAlerts, fetchMarketData]);
+
   return (
     <div className="min-h-screen">
       <Sidebar />

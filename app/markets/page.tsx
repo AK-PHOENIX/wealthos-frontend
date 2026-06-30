@@ -99,7 +99,7 @@ export default function MarketsPage() {
 
                 <div className="my-3 -mx-2">
                   <Sparkline
-                      data={m.history}
+                      data={m.history ?? []}
                       positive={m.change24h >= 0}
                       width={300}
                       height={50}

@@ -4,12 +4,35 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { TrendingUp } from "lucide-react"
 import { Button, Card, Input, Label } from "@/components/ui_wealth"
+import api from "@/lib/api"
+import { useUserStore } from "@/store"
 
 export default function LoginPage() {
     const router = useRouter()
     const [email, setEmail] = useState("")
     const [pw, setPw] = useState("")
     const [err, setErr] = useState("")
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault()
+        if (!email || !pw) {
+            setErr("Email and password required")
+            return
+        }
+        try {
+            const res = await api.post("/identity/auth/login", { email, password: pw })
+            localStorage.setItem("wealthos_token", res.data.token)
+            useUserStore.getState().setUser({
+                id: res.data.user.id,
+                name: res.data.user.name,
+                email: res.data.user.email,
+                income: res.data.user.monthlyIncome || res.data.user.monthly_income || 0
+            })
+            router.push("/dashboard")
+        } catch (error: any) {
+            setErr(error.response?.data?.error || "Invalid email or password")
+        }
+    }
 
     return (
         <div className="min-h-screen grid place-items-center relative px-4">
@@ -24,11 +47,7 @@ export default function LoginPage() {
                 <Card glass>
                     <h1 className="text-2xl font-display font-bold mb-1">Welcome back</h1>
                     <p className="text-sm text-muted-foreground mb-6">Sign in to your portfolio.</p>
-                    <form onSubmit={(e) => {
-                        e.preventDefault()
-                        if (!email || !pw) { setErr("Email and password required"); return }
-                        router.push("/dashboard")
-                    }} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div>
                         <div><Label>Password</Label><Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" /></div>
                         {err && <p className="text-xs text-destructive">{err}</p>}

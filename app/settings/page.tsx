@@ -108,7 +108,7 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        <Button className="mt-6">Save Changes</Button>
+                        <Button className="mt-6" onClick={() => user.saveUser()}>Save Changes</Button>
                     </Card>
                 )}
 

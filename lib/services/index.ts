@@ -1,5 +1,4 @@
-import { usePortfolioStore, useExpenseStore, useBudgetStore, useAlertStore } from "@/store";
-import { mockMarket } from "@/lib/mockData/market";
+import { usePortfolioStore, useExpenseStore, useBudgetStore, useAlertStore, useMarketStore } from "@/store";
 
 export const portfolioService = {
   list: () => usePortfolioStore.getState().holdings,
@@ -22,6 +21,6 @@ export const alertService = {
   remove: useAlertStore.getState().removeAlert,
 };
 export const marketService = {
-  list: () => mockMarket,
-  bySymbol: (s: string) => mockMarket.find((m) => m.symbol === s),
+  list: () => useMarketStore.getState().marketData,
+  bySymbol: (s: string) => useMarketStore.getState().marketData.find((m) => m.symbol === s),
 };
