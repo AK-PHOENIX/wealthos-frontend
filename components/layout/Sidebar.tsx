@@ -12,6 +12,7 @@ import {
   TrendingUp,
   PanelLeftClose,
   PanelLeftOpen,
+  LogOut,
 } from "lucide-react";
 import { useUserStore, useUIStore } from "@/store";
 import { cn } from "@/lib/utils";
@@ -102,21 +103,32 @@ export function Sidebar() {
             <div
                 className={cn(
                     "flex items-center gap-3",
-                    collapsed ? "justify-center" : "px-2 py-1"
+                    collapsed ? "justify-center flex-col" : "px-2 py-1"
                 )}
             >
-              <div className="size-9 rounded-full bg-muted border grid place-items-center text-sm font-medium">
+              <div className="size-9 rounded-full bg-muted border grid place-items-center text-sm font-medium flex-shrink-0">
                 {user.name?.split(" ").map((n) => n[0]).join("")}
               </div>
 
               {!collapsed && (
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium truncate">{user.name}</div>
                     <div className="text-xs text-muted-foreground truncate">
                       {user.email}
                     </div>
                   </div>
               )}
+
+              <button
+                  onClick={() => user.logout()}
+                  title="Log out"
+                  className={cn(
+                      "flex-shrink-0 rounded-lg hover:bg-loss/10 hover:text-loss text-muted-foreground transition-colors duration-200",
+                      collapsed ? "size-8 grid place-items-center" : "size-8 grid place-items-center"
+                  )}
+              >
+                <LogOut className="size-4" />
+              </button>
             </div>
           </div>
         </aside>

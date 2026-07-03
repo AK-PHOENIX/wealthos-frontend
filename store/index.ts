@@ -238,6 +238,7 @@ interface UserState {
   setUser: (p: Partial<UserState>) => void;
   fetchUser: () => Promise<void>;
   saveUser: () => Promise<void>;
+  logout: () => void;
 }
 export const useUserStore = create<UserState>()(
   persist(
@@ -277,6 +278,22 @@ export const useUserStore = create<UserState>()(
           });
         } catch (e) {
           console.error("saveUser error:", e);
+        }
+      },
+      logout: () => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("wealthos_token");
+        }
+        set({
+          id: null,
+          name: "",
+          email: "",
+          income: 0,
+          prefs: { currency: "INR", defaultView: "table" },
+          notifications: { email: true, priceAlerts: true, weekly: false },
+        });
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
       }
     }),
