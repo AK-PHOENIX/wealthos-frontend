@@ -35,7 +35,7 @@ export default function SignupPage() {
         name: form.name,
         email: form.email,
         password: form.pw,
-        monthlyIncome: Number(form.income)
+        monthly_income: Number(form.income)
       });
       localStorage.setItem("wealthos_token", res.data.token);
       setUser({
