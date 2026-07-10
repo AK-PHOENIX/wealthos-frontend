@@ -31,7 +31,7 @@ export function snakeToCamel(obj: any): any {
 }
 
 const api = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 })
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
