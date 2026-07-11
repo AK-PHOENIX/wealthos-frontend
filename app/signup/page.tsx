@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { TrendingUp } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 
 import { Button, Card, Input, Label } from "@/components/ui_wealth";
 import { useUserStore } from "@/store";
@@ -52,13 +53,20 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center relative px-4 py-10">
+    <div className="min-h-screen flex flex-col items-center justify-center relative px-4 py-10">
       <div className="absolute inset-0 -z-10 grid-bg opacity-30" />
+
+      <div className="absolute top-6 left-6">
+        <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="size-4" />
+          Go to Home Page
+        </Link>
+      </div>
 
       <div className="w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 mb-6">
-          <div className="size-9 rounded-xl bg-gradient-to-br from-primary to-accent2 grid place-items-center text-white">
-            <TrendingUp className="size-4" />
+          <div className="size-9 flex items-center justify-center">
+            <Image src="/logo.png" alt="WealthOS" width={36} height={36} className="object-contain filter invert hue-rotate-180 brightness-110 mix-blend-screen" priority />
           </div>
           <span className="font-bold text-xl">WealthOS</span>
         </Link>
