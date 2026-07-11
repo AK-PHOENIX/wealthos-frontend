@@ -53,12 +53,12 @@ export default function AlertsPage() {
 
   return (
       <AppShell title="Alerts">
-        <div className="flex items-end justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl font-display font-bold">
               Price Alerts
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-1">
               Get notified when assets hit your target.
             </p>
           </div>
@@ -87,21 +87,12 @@ export default function AlertsPage() {
                 <table className="w-full text-sm">
                   <thead className="border-b border-border">
                   <tr className="text-left text-xs text-muted-foreground">
-                    {[
-                      "Asset",
-                      "Condition",
-                      "Target",
-                      "Current",
-                      "Status",
-                      "",
-                    ].map((h) => (
-                        <th
-                            key={h}
-                            className="px-4 py-3 font-medium"
-                        >
-                          {h}
-                        </th>
-                    ))}
+                    <th className="px-4 py-3 font-medium">Asset</th>
+                    <th className="px-4 py-3 font-medium hidden sm:table-cell">Condition</th>
+                    <th className="px-4 py-3 font-medium hidden sm:table-cell">Target</th>
+                    <th className="px-4 py-3 font-medium">Current</th>
+                    <th className="px-4 py-3 font-medium hidden sm:table-cell">Status</th>
+                    <th className="px-4 py-3 font-medium"></th>
                   </tr>
                   </thead>
 
@@ -119,14 +110,14 @@ export default function AlertsPage() {
                             {a.symbol}
                           </td>
 
-                          <td className="px-4 py-3 text-muted-foreground">
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
                             Goes {a.condition}{" "}
                             <span className="font-mono-num text-foreground">
                           {formatCurrency(a.targetPrice)}
                         </span>
                           </td>
 
-                          <td className="px-4 py-3 font-mono-num">
+                          <td className="px-4 py-3 font-mono-num hidden sm:table-cell">
                             {formatCurrency(a.targetPrice)}
                           </td>
 
@@ -134,7 +125,7 @@ export default function AlertsPage() {
                             {formatCurrency(cur)}
                           </td>
 
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 hidden sm:table-cell">
                             <Badge
                                 tone={
                                   a.status === "Active"

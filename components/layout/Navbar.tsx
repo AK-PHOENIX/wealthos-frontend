@@ -1,13 +1,23 @@
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, Menu } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
-import { useUserStore, useAlertStore } from "@/store";
+import { useUserStore, useAlertStore, useUIStore } from "@/store";
 
 export function Navbar({ title }: { title: string }) {
   const user = useUserStore();
   const alertCount = useAlertStore((s) => s.alerts.filter((a) => a.status === "Active").length);
+  const setMobileDrawerOpen = useUIStore((s) => s.setMobileDrawerOpen);
   return (
     <header className="sticky top-0 z-20 h-14 px-4 md:px-8 flex items-center justify-between border-b border-border bg-card">
-      <h1 className="text-base md:text-lg font-display font-medium">{title}</h1>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setMobileDrawerOpen(true)}
+          className="md:hidden size-9 inline-flex items-center justify-center rounded-md hover:bg-muted transition-all duration-[280ms] active:opacity-75"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="size-5" />
+        </button>
+        <h1 className="text-base md:text-lg font-display font-medium">{title}</h1>
+      </div>
       <div className="flex items-center gap-2">
         <button className="size-9 hidden sm:inline-flex items-center justify-center rounded-full border border-border bg-elevated hover:bg-muted transition-all duration-[280ms] active:opacity-75" aria-label="Search">
           <Search className="size-4" />

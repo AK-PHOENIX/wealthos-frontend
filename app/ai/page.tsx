@@ -115,8 +115,8 @@ export default function AIPage() {
 
   return (
       <AppShell title="AI Analyst">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 h-[calc(100vh-9rem)]">
-          <Card className="lg:col-span-3 overflow-y-auto">
+        <div className="flex flex-col lg:grid lg:grid-cols-10 gap-4 lg:h-[calc(100vh-9rem)]">
+          <Card className="lg:col-span-3 overflow-y-auto shrink-0">
             <h3 className="font-display font-semibold mb-4">
               Your Financial Snapshot
             </h3>
@@ -136,21 +136,16 @@ export default function AIPage() {
               />
               <Snap
                   label="Top holding"
-                  value={`${topHolding?.symbol} · ${formatCurrency(
-                      (topHolding?.quantity ?? 0) *
-                      (topHolding?.currentPrice ?? 0)
-                  )}`}
+                  value={topHolding ? `${topHolding.symbol} · ${formatCurrency(topHolding.quantity * topHolding.currentPrice)}` : "None"}
               />
               <Snap
                   label="Biggest expense category"
-                  value={`${topExpenseCat?.category} · ${formatCurrency(
-                      topExpenseCat?.spent ?? 0
-                  )}`}
+                  value={topExpenseCat && topExpenseCat.category ? `${topExpenseCat.category} · ${formatCurrency(topExpenseCat.spent)}` : "None"}
               />
             </div>
           </Card>
 
-          <Card className="lg:col-span-7 flex flex-col p-0 overflow-hidden">
+          <Card className="lg:col-span-7 flex flex-col p-0 overflow-hidden h-[550px] lg:h-auto">
             <div
                 ref={ref}
                 className="flex-1 overflow-y-auto p-6 space-y-4"

@@ -42,7 +42,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                <Card className="lg:col-span-3">
+                <Card className="lg:col-span-3 overflow-hidden">
                     <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
                         <h3 className="font-display font-semibold text-sm">Portfolio Value</h3>
                         <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export default function DashboardPage() {
                                         <div className="text-xs text-muted-foreground">{m.name}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-3 whitespace-nowrap flex-shrink-0">
                                     <span className="text-sm font-mono-num">{formatCurrency(m.price)}</span>
                                     <Badge tone={m.change24h >= 0 ? "gain" : "loss"}>
                                         {m.change24h >= 0 ? <ArrowUpRight className="size-3 inline" /> : <ArrowDownRight className="size-3 inline" />}

@@ -59,7 +59,15 @@ export default function PortfolioPage() {
                         <table className="w-full text-sm">
                             <thead className="sticky top-0 bg-card border-b border-border">
                             <tr className="text-left text-xs text-muted-foreground">
-                                {["Asset","Type","Qty","Buy","Current","Value","P&L","7D",""].map((h) => <th key={h} className="px-4 py-3 font-medium">{h}</th>)}
+                                <th className="px-4 py-3 font-medium">Asset</th>
+                                <th className="px-4 py-3 font-medium hidden sm:table-cell">Type</th>
+                                <th className="px-4 py-3 font-medium">Qty</th>
+                                <th className="px-4 py-3 font-medium hidden sm:table-cell">Buy</th>
+                                <th className="px-4 py-3 font-medium">Current</th>
+                                <th className="px-4 py-3 font-medium">Value</th>
+                                <th className="px-4 py-3 font-medium">P&L</th>
+                                <th className="px-4 py-3 font-medium hidden sm:table-cell">7D</th>
+                                <th className="px-4 py-3 font-medium"></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -74,12 +82,12 @@ export default function PortfolioPage() {
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
                                                     <div className="size-9 rounded-lg bg-primary/15 text-primary grid place-items-center font-display font-bold text-xs">{h.symbol.slice(0,2)}</div>
-                                                    <div><div className="font-medium">{h.symbol}</div><div className="text-xs text-muted-foreground">{h.name}</div></div>
+                                                    <div><div className="font-medium">{h.symbol}</div><div className="text-xs text-muted-foreground max-w-[80px] sm:max-w-none truncate">{h.name}</div></div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3"><Badge tone="neutral">{h.type}</Badge></td>
+                                            <td className="px-4 py-3 hidden sm:table-cell"><Badge tone="neutral">{h.type}</Badge></td>
                                             <td className="px-4 py-3 font-mono-num">{h.quantity}</td>
-                                            <td className="px-4 py-3 font-mono-num text-muted-foreground">{formatCurrency(h.buyPrice)}</td>
+                                            <td className="px-4 py-3 font-mono-num text-muted-foreground hidden sm:table-cell">{formatCurrency(h.buyPrice)}</td>
                                             <td className="px-4 py-3 font-mono-num">{formatCurrency(h.currentPrice)}</td>
                                             <td className="px-4 py-3 font-mono-num font-medium">{formatCurrency(value)}</td>
                                             <td className="px-4 py-3">
@@ -88,7 +96,7 @@ export default function PortfolioPage() {
                                                     <div>{formatPercent(plPct)}</div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3"><Sparkline data={spark} positive={pl >= 0} /></td>
+                                            <td className="px-4 py-3 hidden sm:table-cell"><Sparkline data={spark} positive={pl >= 0} /></td>
                                             <td className="px-4 py-3 text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <ChevronDown className={cn("size-4 text-muted-foreground transition", expanded === h.id && "rotate-180")} />

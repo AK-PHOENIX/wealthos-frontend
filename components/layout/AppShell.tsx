@@ -44,7 +44,7 @@ export function AppShell({ children, title }: { children: ReactNode; title: stri
   }, [router, fetchUser, fetchHoldings, fetchExpenses, fetchBudgets, fetchAlerts, fetchMarketData]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh] overflow-x-hidden">
       <Sidebar />
       <div className={cn("transition-[padding] duration-[280ms] [transition-timing-function:cubic-bezier(0.25,0.1,0.25,1)]", collapsed ? "md:pl-16" : "md:pl-60")}>
         <Navbar title={title} />

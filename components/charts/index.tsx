@@ -67,11 +67,11 @@ export function AllocationPie({ data }: { data: { name: string; value: number }[
   );
 }
 
-export function Sparkline({ data, positive = true, height = 36, width = 100 }: { data: number[]; positive?: boolean; height?: number; width?: number }) {
+export function Sparkline({ data, positive = true, height = 36, width = "100%" }: { data: number[]; positive?: boolean; height?: number | string; width?: number | string }) {
   const d = data.map((v, i) => ({ i, v }));
   const color = positive ? "var(--gain)" : "var(--loss)";
   return (
-    <ResponsiveContainer width={width} height={height}>
+    <ResponsiveContainer width={width as any} height={height as any}>
       <LineChart data={d}>
         <Line type="monotone" dataKey="v" stroke={color} strokeWidth={1.5} dot={false} />
       </LineChart>

@@ -109,13 +109,13 @@ export default function ExpensesPage() {
           </Button>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 mb-4 scrollbar-hide pb-1">
           {["All", ...CATEGORIES].map((c) => (
               <button
                   key={c}
                   onClick={() => setFilter(c)}
                   className={cn(
-                      "px-3 h-8 rounded-full text-xs",
+                      "flex-shrink-0 px-3 h-8 rounded-full text-xs",
                       filter === c
                           ? "bg-primary text-white"
                           : "bg-muted text-muted-foreground"
@@ -135,12 +135,14 @@ export default function ExpensesPage() {
                     <div className="text-xs mb-2">{dateLabel(date)}</div>
 
                     {items.map((e) => (
-                        <div key={e.id} className="flex justify-between p-2">
-                          <div>{e.description}</div>
-                          <div>{formatCurrency(e.amount)}</div>
-                          <button onClick={() => removeExpense(e.id)}>
-                            <Trash2 className="size-4" />
-                          </button>
+                        <div key={e.id} className="flex flex-wrap items-center justify-between p-2 gap-2">
+                          <div className="flex-1 min-w-[120px] truncate">{e.description}</div>
+                          <div className="flex items-center gap-3">
+                            <div className="font-mono-num">{formatCurrency(e.amount)}</div>
+                            <button onClick={() => removeExpense(e.id)} className="text-muted-foreground hover:text-loss transition">
+                              <Trash2 className="size-4" />
+                            </button>
+                          </div>
                         </div>
                     ))}
                   </div>

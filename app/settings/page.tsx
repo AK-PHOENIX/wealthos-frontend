@@ -22,9 +22,9 @@ function Row({
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex items-center justify-between">
-            <span className="text-sm">{label}</span>
-            {children}
+        <div className="flex items-center justify-between gap-3">
+            <span className="text-sm shrink-0">{label}</span>
+            <div className="flex-1 flex justify-end min-w-0">{children}</div>
         </div>
     );
 }

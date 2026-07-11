@@ -219,12 +219,15 @@ export const useThemeStore = create<ThemeState>()(
   persist((set) => ({ theme: "dark", setTheme: (t) => set({ theme: t }) }), { name: "wealthos-theme" })
 );
 
-interface UIState { sidebarCollapsed: boolean; toggleSidebar: () => void; setSidebarCollapsed: (v: boolean) => void; }
+interface UIState { sidebarCollapsed: boolean; toggleSidebar: () => void; setSidebarCollapsed: (v: boolean) => void; mobileDrawerOpen: boolean; toggleMobileDrawer: () => void; setMobileDrawerOpen: (v: boolean) => void; }
 export const useUIStore = create<UIState>()(
   persist((set) => ({
     sidebarCollapsed: false,
     toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
     setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
+    mobileDrawerOpen: false,
+    toggleMobileDrawer: () => set((s) => ({ mobileDrawerOpen: !s.mobileDrawerOpen })),
+    setMobileDrawerOpen: (v) => set({ mobileDrawerOpen: v }),
   }), { name: "wealthos-ui" })
 );
 

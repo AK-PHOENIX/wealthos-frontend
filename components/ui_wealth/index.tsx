@@ -83,12 +83,12 @@ export function Modal({ open, onClose, title, children, size = "md" }: { open: b
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 animate-in fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center p-3 sm:p-4 bg-black/60 animate-in fade-in" onClick={onClose}>
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
-        className={cn("relative bg-card border border-border rounded-2xl p-8 w-full", size === "lg" ? "max-w-2xl" : "max-w-md")}
+        className={cn("relative bg-card border border-border rounded-2xl p-5 sm:p-8 w-full", size === "lg" ? "sm:max-w-2xl" : "sm:max-w-md")}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -117,7 +117,7 @@ export function SlideOver({ open, onClose, title, children }: { open: boolean; o
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         transition={{ duration: 0.38, ease: [0.25, 0.1, 0.25, 1] }}
-        className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-card border-l border-border p-8 overflow-y-auto"
+        className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-card border-l border-border p-5 sm:p-8 overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -161,7 +161,7 @@ export function EmptyState({ icon: Icon, title, subtitle, action }: { icon: any;
 
 export function Tabs<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
   return (
-    <div className="inline-flex p-1 bg-elevated rounded-[10px] border border-border">
+    <div className="inline-flex p-1 bg-elevated rounded-[10px] border border-border overflow-x-auto max-w-full scrollbar-hide">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -194,9 +194,9 @@ export function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: 
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={cn("relative w-10 h-6 rounded-full transition-colors", checked ? "bg-primary" : "bg-muted")}
+      className={cn("relative w-10 h-6 rounded-full transition-colors flex-shrink-0", checked ? "bg-primary" : "bg-muted")}
     >
-      <span className={cn("absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5")} />
+      <span className={cn("absolute left-0 top-0.5 size-5 rounded-full bg-white shadow transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5")} />
     </button>
   );
 }
