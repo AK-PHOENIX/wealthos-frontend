@@ -1,19 +1,26 @@
 'use client'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react"
 import { AppShell } from "@/components/layout/AppShell"
 import { Card, AnimatedNumber, Badge, Tabs } from "@/components/ui_wealth"
 import { PortfolioAreaChart, AllocationPie } from "@/components/charts"
 import { usePortfolioStats } from "@/hooks/usePortfolioStats"
-import { usePortfolioStore, useBudgetStore } from "@/store"
+import { usePortfolioStore, useBudgetStore, useDashboardStore } from "@/store"
 import { formatCurrency, formatPercent } from "@/lib/utils"
 import { mockMarket } from "@/lib/mockData/market"
 
 export default function DashboardPage() {
     const stats = usePortfolioStats()
     const transactions = usePortfolioStore((s) => s.transactions)
+    const fetchHoldings = usePortfolioStore((s) => s.fetchHoldings)
     const budgets = useBudgetStore((s) => s.budgets)
+    const fetchBudgets = useBudgetStore((s) => s.fetchBudgets)
+    const fetchDashboardData = useDashboardStore((s) => s.fetchDashboardData)
     const [range, setRange] = useState<"1W" | "1M" | "3M" | "1Y" | "ALL">("1M")
+
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
 
     const days = stats.holdings[0]?.history?.length ?? 30
     const rangeDays: Record<string, number> = { "1W": 7, "1M": 30, "3M": 30, "1Y": 30, "ALL": 30 }

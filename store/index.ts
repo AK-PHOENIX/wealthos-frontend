@@ -44,24 +44,34 @@ const mapBackendHoldingToFrontend = (h: any): Holding => {
   };
 };
 
+const STALE_MS = 2 * 60 * 1000; // 2 minutes — data fresher than this won't be re-fetched
+const isStale = (ts: number | null) => ts === null || Date.now() - ts > STALE_MS;
+
 interface PortfolioState {
   holdings: Holding[];
   transactions: any[];
   activePortfolioId: number | null;
-  fetchHoldings: () => Promise<void>;
+  lastFetchedAt: number | null;
+  isFetching: boolean;
+  fetchHoldings: (force?: boolean) => Promise<void>;
   addHolding: (h: Omit<Holding, "id" | "history">) => Promise<void>;
   removeHolding: (id: string) => Promise<void>;
   updateHolding: (id: string, patch: Partial<Holding>) => Promise<void>;
 }
-export const usePortfolioStore = create<PortfolioState>()((set) => ({
+export const usePortfolioStore = create<PortfolioState>()((set, get) => ({
   holdings: [],
   transactions: [],
   activePortfolioId: null,
-  fetchHoldings: async () => {
+  lastFetchedAt: null,
+  isFetching: false,
+  fetchHoldings: async (force = false) => {
+    const s = get();
+    if (!force && (s.isFetching || !isStale(s.lastFetchedAt))) return;
+    set({ isFetching: true });
     try {
       const portfoliosRes = await api.get("/portfolio/portfolios");
       const portfolios = portfoliosRes.data;
-      if (!portfolios || portfolios.length === 0) return;
+      if (!portfolios || portfolios.length === 0) { set({ isFetching: false, lastFetchedAt: Date.now() }); return; }
       const firstPortfolio = portfolios[0];
       const activeId = firstPortfolio.id;
       set({ activePortfolioId: activeId });
@@ -69,9 +79,10 @@ export const usePortfolioStore = create<PortfolioState>()((set) => ({
       const detailsRes = await api.get(`/portfolio/portfolios/${activeId}`);
       const holdings = (detailsRes.data.holdings || []).map(mapBackendHoldingToFrontend);
       const transactions = detailsRes.data.transactions || [];
-      set({ holdings, transactions });
+      set({ holdings, transactions, lastFetchedAt: Date.now(), isFetching: false });
     } catch (e) {
       console.error("fetchHoldings error:", e);
+      set({ isFetching: false });
     }
   },
   addHolding: async (h) => {
@@ -90,16 +101,15 @@ export const usePortfolioStore = create<PortfolioState>()((set) => ({
       buyPrice: h.buyPrice,
       buyDate: h.buyDate
     });
-    await usePortfolioStore.getState().fetchHoldings();
+    await usePortfolioStore.getState().fetchHoldings(true); // force refresh after mutation
   },
   removeHolding: async (id) => {
     const activeId = usePortfolioStore.getState().activePortfolioId;
     if (!activeId) return;
     await api.delete(`/portfolio/portfolios/${activeId}/holdings/${id}`);
-    await usePortfolioStore.getState().fetchHoldings();
+    await usePortfolioStore.getState().fetchHoldings(true);
   },
   updateHolding: async (id, patch) => {
-    // Basic local state update or add API call if required
     set((s) => ({ holdings: s.holdings.map((h) => h.id === id ? { ...h, ...patch } : h) }));
   }
 }));
@@ -107,25 +117,31 @@ export const usePortfolioStore = create<PortfolioState>()((set) => ({
 interface ExpenseState {
   expenses: Expense[];
   isLoading: boolean;
-  fetchExpenses: () => Promise<void>;
+  lastFetchedAt: number | null;
+  isFetching: boolean;
+  fetchExpenses: (force?: boolean) => Promise<void>;
   addExpense: (e: Omit<Expense, "id">) => Promise<void>;
   removeExpense: (id: string) => Promise<void>;
 }
-export const useExpenseStore = create<ExpenseState>()((set) => ({
+export const useExpenseStore = create<ExpenseState>()((set, get) => ({
   expenses: [],
   isLoading: false,
-  fetchExpenses: async () => {
-    set({ isLoading: true });
+  lastFetchedAt: null,
+  isFetching: false,
+  fetchExpenses: async (force = false) => {
+    const s = get();
+    if (!force && (s.isFetching || !isStale(s.lastFetchedAt))) return;
+    set({ isLoading: true, isFetching: true });
     try {
       const res = await api.get("/users/expenses");
       const expenses = (res.data || []).map((e: any) => ({
         ...e,
         date: e.date || e.expenseDate || e.expense_date
       }));
-      set({ expenses, isLoading: false });
+      set({ expenses, isLoading: false, lastFetchedAt: Date.now(), isFetching: false });
     } catch (e) {
       console.error(e);
-      set({ isLoading: false });
+      set({ isLoading: false, isFetching: false });
     }
   },
   addExpense: async (e) => {
@@ -136,37 +152,43 @@ export const useExpenseStore = create<ExpenseState>()((set) => ({
       category: e.category,
       aiCategorize: true
     });
-    await useExpenseStore.getState().fetchExpenses();
+    await useExpenseStore.getState().fetchExpenses(true);
   },
   removeExpense: async (id) => {
     await api.delete(`/users/expenses/${id}`);
-    await useExpenseStore.getState().fetchExpenses();
+    await useExpenseStore.getState().fetchExpenses(true);
   }
 }));
 
 interface BudgetState {
   budgets: BudgetGoal[];
   isLoading: boolean;
-  fetchBudgets: () => Promise<void>;
+  lastFetchedAt: number | null;
+  isFetching: boolean;
+  fetchBudgets: (force?: boolean) => Promise<void>;
   updateBudget: (id: string, limit: number) => Promise<void>;
   addBudget: (b: Omit<BudgetGoal, "id" | "spent">) => Promise<void>;
 }
-export const useBudgetStore = create<BudgetState>()((set) => ({
+export const useBudgetStore = create<BudgetState>()((set, get) => ({
   budgets: [],
   isLoading: false,
-  fetchBudgets: async () => {
-    set({ isLoading: true });
+  lastFetchedAt: null,
+  isFetching: false,
+  fetchBudgets: async (force = false) => {
+    const s = get();
+    if (!force && (s.isFetching || !isStale(s.lastFetchedAt))) return;
+    set({ isLoading: true, isFetching: true });
     try {
       const res = await api.get("/users/budgets");
-      set({ budgets: res.data || [], isLoading: false });
+      set({ budgets: res.data || [], isLoading: false, lastFetchedAt: Date.now(), isFetching: false });
     } catch (e) {
       console.error(e);
-      set({ isLoading: false });
+      set({ isLoading: false, isFetching: false });
     }
   },
   updateBudget: async (id, limit) => {
     await api.put(`/users/budgets/${id}`, { limit });
-    await useBudgetStore.getState().fetchBudgets();
+    await useBudgetStore.getState().fetchBudgets(true);
   },
   addBudget: async (b) => {
     await api.post("/users/budgets", {
@@ -175,28 +197,34 @@ export const useBudgetStore = create<BudgetState>()((set) => ({
       month: b.month,
       year: b.year
     });
-    await useBudgetStore.getState().fetchBudgets();
+    await useBudgetStore.getState().fetchBudgets(true);
   }
 }));
 
 interface AlertState {
   alerts: PriceAlert[];
   isLoading: boolean;
-  fetchAlerts: () => Promise<void>;
+  lastFetchedAt: number | null;
+  isFetching: boolean;
+  fetchAlerts: (force?: boolean) => Promise<void>;
   addAlert: (a: Omit<PriceAlert, "id" | "status" | "currentPrice">) => Promise<void>;
   removeAlert: (id: string) => Promise<void>;
 }
-export const useAlertStore = create<AlertState>()((set) => ({
+export const useAlertStore = create<AlertState>()((set, get) => ({
   alerts: [],
   isLoading: false,
-  fetchAlerts: async () => {
-    set({ isLoading: true });
+  lastFetchedAt: null,
+  isFetching: false,
+  fetchAlerts: async (force = false) => {
+    const s = get();
+    if (!force && (s.isFetching || !isStale(s.lastFetchedAt))) return;
+    set({ isLoading: true, isFetching: true });
     try {
       const res = await api.get("/users/alerts");
-      set({ alerts: res.data || [], isLoading: false });
+      set({ alerts: res.data || [], isLoading: false, lastFetchedAt: Date.now(), isFetching: false });
     } catch (e) {
       console.error(e);
-      set({ isLoading: false });
+      set({ isLoading: false, isFetching: false });
     }
   },
   addAlert: async (a) => {
@@ -205,11 +233,11 @@ export const useAlertStore = create<AlertState>()((set) => ({
       condition: a.condition,
       targetPrice: a.targetPrice
     });
-    await useAlertStore.getState().fetchAlerts();
+    await useAlertStore.getState().fetchAlerts(true);
   },
   removeAlert: async (id) => {
     await api.delete(`/users/alerts/${id}`);
-    await useAlertStore.getState().fetchAlerts();
+    await useAlertStore.getState().fetchAlerts(true);
   }
 }));
 
@@ -239,7 +267,9 @@ interface UserState {
   prefs: { currency: "INR" | "USD"; defaultView: "table" | "grid" };
   notifications: { email: boolean; priceAlerts: boolean; weekly: boolean };
   setUser: (p: Partial<UserState>) => void;
-  fetchUser: () => Promise<void>;
+  lastFetchedAt: number | null;
+  isFetching: boolean;
+  fetchUser: (force?: boolean) => Promise<void>;
   saveUser: () => Promise<void>;
   logout: () => void;
 }
@@ -252,8 +282,14 @@ export const useUserStore = create<UserState>()(
       income: 0,
       prefs: { currency: "INR", defaultView: "table" },
       notifications: { email: true, priceAlerts: true, weekly: false },
+      lastFetchedAt: null,
+      isFetching: false,
       setUser: (p) => set((s) => ({ ...s, ...p })),
-      fetchUser: async () => {
+      fetchUser: async (force = false) => {
+        const s = get();
+        // Use a longer stale time for user data (e.g., 5 mins) or just the standard 2 mins
+        if (!force && (s.isFetching || !isStale(s.lastFetchedAt))) return;
+        set({ isFetching: true });
         try {
           const res = await api.get("/users/me");
           set({
@@ -264,10 +300,13 @@ export const useUserStore = create<UserState>()(
             prefs: {
               currency: res.data.currency || "INR",
               defaultView: get().prefs.defaultView || "table"
-            }
+            },
+            lastFetchedAt: Date.now(),
+            isFetching: false
           });
         } catch (e) {
           console.error("fetchUser error:", e);
+          set({ isFetching: false });
         }
       },
       saveUser: async () => {
@@ -307,23 +346,74 @@ export const useUserStore = create<UserState>()(
 interface MarketState {
   marketData: MarketAsset[];
   isLoading: boolean;
-  fetchMarketData: () => Promise<void>;
+  lastFetchedAt: number | null;
+  isFetching: boolean;
+  fetchMarketData: (force?: boolean) => Promise<void>;
 }
-export const useMarketStore = create<MarketState>()((set) => ({
+export const useMarketStore = create<MarketState>()((set, get) => ({
   marketData: [],
   isLoading: false,
-  fetchMarketData: async () => {
-    set({ isLoading: true });
+  lastFetchedAt: null,
+  isFetching: false,
+  fetchMarketData: async (force = false) => {
+    const s = get();
+    // Markets use a 5-minute stale window (prices cached on backend anyway)
+    const MARKET_STALE_MS = 5 * 60 * 1000;
+    const marketStale = s.lastFetchedAt === null || Date.now() - s.lastFetchedAt > MARKET_STALE_MS;
+    if (!force && (s.isFetching || !marketStale)) return;
+    set({ isLoading: true, isFetching: true });
     try {
       const res = await api.get("/market/markets");
       const data = (res.data || []).map((item: any) => ({
         ...item,
         history: generateSparkHistory(item.price)
       }));
-      set({ marketData: data, isLoading: false });
+      set({ marketData: data, isLoading: false, lastFetchedAt: Date.now(), isFetching: false });
     } catch (e) {
       console.error(e);
-      set({ isLoading: false });
+      set({ isLoading: false, isFetching: false });
+    }
+  }
+}));
+
+interface DashboardState {
+  isFetching: boolean;
+  fetchDashboardData: (force?: boolean) => Promise<void>;
+}
+export const useDashboardStore = create<DashboardState>()((set, get) => ({
+  isFetching: false,
+  fetchDashboardData: async (force = false) => {
+    const s = get();
+    const pState = usePortfolioStore.getState();
+    const bState = useBudgetStore.getState();
+    
+    // Check if either holdings or budgets need fetching
+    if (!force && (s.isFetching || (!isStale(pState.lastFetchedAt) && !isStale(bState.lastFetchedAt)))) return;
+    
+    set({ isFetching: true });
+    try {
+      const res = await api.get("/admin/dashboard");
+      
+      // Hydrate the existing stores with the consolidated data
+      const holdings = (res.data.holdings || []).map(mapBackendHoldingToFrontend);
+      
+      usePortfolioStore.setState({
+        holdings: holdings,
+        transactions: res.data.transactions,
+        lastFetchedAt: Date.now(),
+        isFetching: false
+      });
+      
+      useBudgetStore.setState({
+        budgets: res.data.budgets,
+        lastFetchedAt: Date.now(),
+        isFetching: false
+      });
+      
+      set({ isFetching: false });
+    } catch (e) {
+      console.error("fetchDashboardData error:", e);
+      set({ isFetching: false });
     }
   }
 }));
@@ -336,9 +426,21 @@ export function applyLivePrices(
 ) {
   return holdings.map(h => {
     if (h.type === 'Crypto' && tickers[h.symbol]) {
-      const livePrice = tickers[h.symbol].price * usdInr
-      return { ...h, currentPrice: livePrice }
+      const livePrice = tickers[h.symbol].price * usdInr;
+      const pnl = (livePrice - h.buyPrice) * h.quantity;
+      const pnlPercent = h.buyPrice > 0 ? ((livePrice - h.buyPrice) / h.buyPrice) * 100 : 0;
+      
+      // Update history's latest data point to reflect live price
+      const updatedHistory = [...h.history];
+      if (updatedHistory.length > 0) {
+        updatedHistory[updatedHistory.length - 1] = {
+          ...updatedHistory[updatedHistory.length - 1],
+          price: livePrice
+        };
+      }
+      
+      return { ...h, currentPrice: livePrice, pnl, pnlPercent, history: updatedHistory };
     }
-    return h
-  })
+    return h;
+  });
 }

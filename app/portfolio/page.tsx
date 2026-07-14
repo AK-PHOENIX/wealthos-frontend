@@ -1,5 +1,5 @@
 'use client'
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { Plus, Trash2, Wallet, ChevronDown } from "lucide-react"
 import { AppShell } from "@/components/layout/AppShell"
 import { Button, Card, Badge, Input, Label, SlideOver, EmptyState, Select, Tabs } from "@/components/ui_wealth"
@@ -19,12 +19,14 @@ export default function PortfolioPage() {
     // Override stats holdings with live prices
     const stats = usePortfolioStats()
     const liveHoldings = applyLivePrices(stats.holdings, tickers, usdInr)
-    const { addHolding, removeHolding } = usePortfolioStore()
+    const { addHolding, removeHolding, fetchHoldings } = usePortfolioStore()
     const [open, setOpen] = useState(false)
     const [expanded, setExpanded] = useState<string | null>(null)
     const [filter, setFilter] = useState<"All" | "Stock" | "Crypto" | "Mutual Fund">("All")
     const [form, setForm] = useState({ symbol: "", name: "", type: "Stock" as AssetType, quantity: "", buyPrice: "", currentPrice: "", buyDate: new Date().toISOString().slice(0,10) })
     const [err, setErr] = useState("")
+
+    useEffect(() => { fetchHoldings(); }, []);
 
     function submit(e: React.FormEvent) {
         e.preventDefault()

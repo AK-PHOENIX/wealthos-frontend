@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Bell, Trash2 } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -20,7 +20,9 @@ import { marketService } from "@/lib/services";
 import { formatCurrency, cn } from "@/lib/utils";
 
 export default function AlertsPage() {
-  const { alerts, addAlert, removeAlert } = useAlertStore();
+  const { alerts, addAlert, removeAlert, fetchAlerts } = useAlertStore();
+
+  useEffect(() => { fetchAlerts(); }, []);
 
   const [open, setOpen] = useState(false);
 

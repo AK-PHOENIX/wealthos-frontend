@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Plus, Trash2, Sparkles } from "lucide-react";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -12,7 +12,9 @@ import { formatCurrency, classifyExpense, cn } from "@/lib/utils";
 const CATEGORIES = ["Food","Transport","EMI","Entertainment","Healthcare","Shopping","Other"];
 
 export default function ExpensesPage() {
-  const { expenses, addExpense, removeExpense } = useExpenseStore();
+  const { expenses, addExpense, removeExpense, fetchExpenses } = useExpenseStore();
+
+  useEffect(() => { fetchExpenses(); }, []);
 
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState(false);

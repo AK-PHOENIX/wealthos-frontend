@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card, Button, Modal, Input, Label } from "@/components/ui_wealth";
@@ -8,9 +8,11 @@ import { useBudgetStore } from "@/store";
 import { formatCurrency } from "@/lib/utils";
 
 export default function Budget() {
-    const { budgets, updateBudget } = useBudgetStore();
+    const { budgets, updateBudget, fetchBudgets } = useBudgetStore();
     const [editing, setEditing] = useState<string | null>(null);
     const [limit, setLimit] = useState("");
+
+    useEffect(() => { fetchBudgets(); }, []);
 
     const totalLimit = budgets.reduce((a, b) => a + b.limit, 0);
     const totalSpent = budgets.reduce((a, b) => a + b.spent, 0);
