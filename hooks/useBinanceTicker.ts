@@ -36,7 +36,7 @@ export function useBinanceTicker() {
   const [tickers, setTickers] = useState<Record<string, TickerData>>({})
   const [connected, setConnected] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)
-  const reconnectRef = useRef<ReturnType<typeof setTimeout>>()
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     function connect() {
@@ -81,7 +81,7 @@ export function useBinanceTicker() {
     connect()
 
     return () => {
-      clearTimeout(reconnectRef.current)
+      if (reconnectRef.current) clearTimeout(reconnectRef.current)
       wsRef.current?.close()
     }
   }, [])

@@ -83,7 +83,7 @@ export default function PortfolioPage() {
                                 const value = h.quantity * h.currentPrice
                                 const pl = (h.currentPrice - h.buyPrice) * h.quantity
                                 const plPct = ((h.currentPrice - h.buyPrice) / h.buyPrice) * 100
-                                const spark = h.history.slice(-7).map((p) => p.price)
+                                const spark = h.history.slice(-7).map((p: { price: number }) => p.price)
                                 return (
                                     <Fragment key={h.id}>
                                         <tr className={cn("border-b border-border hover:bg-muted/40 transition cursor-pointer", idx % 2 && "bg-muted/20")} onClick={() => setExpanded(expanded === h.id ? null : h.id)}>
