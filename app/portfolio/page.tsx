@@ -8,9 +8,17 @@ import { usePortfolioStore } from "@/store"
 import { usePortfolioStats } from "@/hooks/usePortfolioStats"
 import { formatCurrency, formatPercent, cn } from "@/lib/utils"
 import type { AssetType } from "@/types"
+import { useBinanceTicker } from '@/hooks/useBinanceTicker'
+import { useUsdInr } from '@/hooks/useUsdInr'
+import { applyLivePrices } from '@/store'
 
 export default function PortfolioPage() {
+    const { tickers } = useBinanceTicker()
+    const usdInr = useUsdInr()
+
+    // Override stats holdings with live prices
     const stats = usePortfolioStats()
+    const liveHoldings = applyLivePrices(stats.holdings, tickers, usdInr)
     const { addHolding, removeHolding } = usePortfolioStore()
     const [open, setOpen] = useState(false)
     const [expanded, setExpanded] = useState<string | null>(null)
@@ -42,7 +50,7 @@ export default function PortfolioPage() {
                 <Button onClick={() => setOpen(true)}><Plus className="size-4" /> Add Holding</Button>
             </div>
 
-            {stats.holdings.length === 0 ? (
+            {liveHoldings.length === 0 ? (
                 <EmptyState icon={Wallet} title="No holdings yet" subtitle="Add your first asset to start tracking." action={<Button onClick={() => setOpen(true)}><Plus className="size-4" />Add Holding</Button>} />
             ) : (
                 <Card className="p-0 overflow-hidden">
@@ -53,7 +61,7 @@ export default function PortfolioPage() {
                             { value: "Crypto", label: "Crypto" },
                             { value: "Mutual Fund", label: "Mutual Funds" },
                         ]} />
-                        <span className="text-xs text-muted-foreground font-mono-num">{stats.holdings.filter((h) => filter === "All" || h.type === filter).length} holdings</span>
+                        <span className="text-xs text-muted-foreground font-mono-num">{liveHoldings.filter((h) => filter === "All" || h.type === filter).length} holdings</span>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
@@ -71,7 +79,7 @@ export default function PortfolioPage() {
                             </tr>
                             </thead>
                             <tbody>
-                            {stats.holdings.filter((h) => filter === "All" || h.type === filter).map((h, idx) => {
+                            {liveHoldings.filter((h) => filter === "All" || h.type === filter).map((h, idx) => {
                                 const value = h.quantity * h.currentPrice
                                 const pl = (h.currentPrice - h.buyPrice) * h.quantity
                                 const plPct = ((h.currentPrice - h.buyPrice) / h.buyPrice) * 100
