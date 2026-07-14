@@ -4,17 +4,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
-  TrendingUp,
   Sparkles,
   LineChart,
   PiggyBank,
   ArrowRight,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import { Button, Card } from "@/components/ui_wealth";
 import { formatCurrency } from "@/lib/utils";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function HomePage() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark" || (theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background */}
@@ -29,12 +34,22 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto h-16 px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="size-8 flex items-center justify-center overflow-hidden p-0.5">
+              {/* Light mode logo */}
               <Image
-                src="/logo.png"
+                src="/wealthos-dark.png"
                 alt="WealthOS"
                 width={32}
                 height={32}
-                className="object-contain"
+                className="object-contain block dark:hidden"
+                priority
+              />
+              {/* Dark mode logo */}
+              <Image
+                src="/wealthos-light.png"
+                alt="WealthOS"
+                width={32}
+                height={32}
+                className="object-contain hidden dark:block"
                 priority
               />
             </div>
@@ -45,6 +60,15 @@ export default function HomePage() {
           </Link>
 
           <nav className="flex items-center gap-2">
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              aria-label="Toggle theme"
+              className="size-9 grid place-items-center rounded-lg border border-border/60 bg-background/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-200"
+            >
+              {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
+
             <Link href="/login">
               <Button variant="ghost" size="sm">
                 Login

@@ -49,7 +49,10 @@ export default function LoginPage() {
             <div className="w-full max-w-md">
                 <Link href="/" className="flex items-center justify-center gap-2 mb-6">
                     <div className="size-9 flex items-center justify-center">
-                        <Image src="/logo.png" alt="WealthOS" width={36} height={36} className="object-contain filter invert hue-rotate-180 brightness-110 mix-blend-screen" priority />
+                        {/* Light mode logo */}
+                        <Image src="/wealthos-dark.png" alt="WealthOS" width={36} height={36} className="object-contain block dark:hidden" priority />
+                        {/* Dark mode logo */}
+                        <Image src="/wealthos-light.png" alt="WealthOS" width={36} height={36} className="object-contain hidden dark:block" priority />
                     </div>
                     <span className="font-display font-bold text-xl">WealthOS</span>
                 </Link>

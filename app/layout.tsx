@@ -15,6 +15,11 @@ try {
 export const metadata: Metadata = {
   title: 'WealthOS — AI-Powered Portfolio Tracker',
   description: 'Track stocks, crypto and mutual funds with AI-powered insights. Built for Indian investors.',
+  icons: {
+    icon: '/wealthos-dark.png',
+    shortcut: '/wealthos-dark.png',
+    apple: '/wealthos-dark.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -327,3 +327,18 @@ export const useMarketStore = create<MarketState>()((set) => ({
     }
   }
 }));
+
+// Live price updater — call this from portfolio page with Binance tickers
+export function applyLivePrices(
+  holdings: any[],
+  tickers: Record<string, any>,
+  usdInr: number
+) {
+  return holdings.map(h => {
+    if (h.type === 'Crypto' && tickers[h.symbol]) {
+      const livePrice = tickers[h.symbol].price * usdInr
+      return { ...h, currentPrice: livePrice }
+    }
+    return h
+  })
+}

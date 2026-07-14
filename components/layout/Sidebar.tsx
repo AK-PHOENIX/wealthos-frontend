@@ -12,8 +12,7 @@ import {
   Bell,
   Settings as SettingsIcon,
   TrendingUp,
-  PanelLeftClose,
-  PanelLeftOpen,
+  ChevronLeft,
   LogOut,
   X,
   Sparkles,
@@ -94,7 +93,10 @@ export function Sidebar() {
           {!collapsed && (
             <div className="flex items-center gap-2 min-w-0">
               <div className="size-7 flex items-center justify-center">
-                <Image src="/wealthos-light.png" alt="WealthOS" width={28} height={28} className="object-contain" priority />
+                {/* Light mode logo */}
+                <Image src="/wealthos-dark.png" alt="WealthOS" width={28} height={28} className="object-contain block dark:hidden" priority />
+                {/* Dark mode logo */}
+                <Image src="/wealthos-light.png" alt="WealthOS" width={28} height={28} className="object-contain hidden dark:block" priority />
               </div>
               <span className="font-semibold text-sm">WealthOS</span>
             </div>
@@ -102,13 +104,13 @@ export function Sidebar() {
 
           <button
             onClick={toggle}
-            className="size-8 grid place-items-center rounded-lg hover:bg-muted"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="size-8 grid place-items-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200"
           >
-            {collapsed ? (
-              <PanelLeftOpen className="size-4" />
-            ) : (
-              <PanelLeftClose className="size-4" />
-            )}
+            <ChevronLeft
+              className="size-4 transition-transform duration-300"
+              style={{ transform: collapsed ? "rotate(180deg)" : "rotate(0deg)" }}
+            />
           </button>
         </div>
 
@@ -202,8 +204,11 @@ export function Sidebar() {
               {/* Drawer Header */}
               <div className="h-14 flex items-center justify-between px-5 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <div className="size-7 flex items-center justify-center">
-                    <Image src="/wealthos-light.png" alt="WealthOS" width={28} height={28} className="object-contain" />
+                    <div className="size-7 flex items-center justify-center">
+                    {/* Light mode logo */}
+                    <Image src="/wealthos-dark.png" alt="WealthOS" width={28} height={28} className="object-contain block dark:hidden" />
+                    {/* Dark mode logo */}
+                    <Image src="/wealthos-light.png" alt="WealthOS" width={28} height={28} className="object-contain hidden dark:block" />
                   </div>
                   <span className="font-semibold text-sm font-display">WealthOS</span>
                 </div>
